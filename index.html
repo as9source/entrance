@@ -74,20 +74,18 @@
         baseHOffset += 15;
       }
 
-      // 水平ズレ（→ H に影響）: wDiff > 基本マイナス絶対値 - 2
-      let extraH = 0;
-      if (wDiff >= Math.abs(baseHOffset) - 2) {
-        extraH = Math.floor(wDiff - (Math.abs(baseHOffset) - 2) + 1);
+      // 補正式: 基本マイナス値 - MAX(ズレ量 - (基本マイナス絶対値 - 2), 0)
+      function correctedOffset(baseOffset, diff) {
+        const threshold = Math.abs(baseOffset) - 2;
+        const extra = Math.max(diff - threshold, 0);
+        return baseOffset - extra;
       }
 
-      // 垂直ズレ（→ W に影響）: hDiff > 基本マイナス絶対値 - 2
-      let extraW = 0;
-      if (hDiff >= Math.abs(baseWOffset) - 2) {
-        extraW = Math.floor(hDiff - (Math.abs(baseWOffset) - 2) + 1);
-      }
+      const finalWOffset = correctedOffset(baseWOffset, hDiff); // W: 垂直ズレ
+      const finalHOffset = correctedOffset(baseHOffset, wDiff); // H: 水平ズレ
 
-      const resultW = KW + baseWOffset - extraW;
-      const resultH = KH + baseHOffset - extraH;
+      const resultW = KW + finalWOffset;
+      const resultH = KH + finalHOffset;
 
       document.getElementById('result').textContent =
         `結果 → 幅: ${resultW} mm ／ 高さ: ${resultH} mm`;
