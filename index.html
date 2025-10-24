@@ -73,7 +73,7 @@
       // ズレ補正ルール：基本マイナスが -10 なら 7mmまではそのまま
       function getCorrectedMinus(baseMinus, diff, skip) {
         if (skip) return 0;
-        const threshold = Math.abs(baseMinus) - 2;
+        const threshold = Math.abs(baseMinus) - 3;
         const extra = diff > threshold ? diff - threshold : 0;
         return baseMinus - extra;
       }
