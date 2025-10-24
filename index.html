@@ -66,31 +66,25 @@
         document.getElementById('warning').textContent = '⚠ 高さ（KH）が横幅（KW）より小さいです。確認してください。';
       }
 
-      // WとHの基本マイナス設定（ハツリ有無に関係なし）
+      // 基本マイナス値
       const baseWMinus = type === '半外付' ? -20 : -10;
       const baseHMinus = type === '半外付' ? -10 : -5;
 
-      // ハツリ納まり：H寸法に+15mmしてから補正計算に入る
-      let adjustedKH = KH;
-      if (hatsuri) {
-        adjustedKH += 15;
-      }
+      // Hへのハツリ加算
+      const rawH = hatsuri ? KH + 15 : KH;
 
-      // 補正ルール（ズレが基本マイナス絶対値 - 2を超えたら、差分だけマイナスを深く）
-      function getCorrectedOffset(baseMinus, diff) {
+      // 補正関数（ズレ量が (基本マイナスの絶対値 - 2) を超えたら、1mmごとにマイナスを深く）
+      function getCorrectedMinus(baseMinus, diff) {
         const threshold = Math.abs(baseMinus) - 2;
-        const extra = diff > threshold ? (diff - threshold) : 0;
+        const extra = diff > threshold ? diff - threshold : 0;
         return baseMinus - extra;
       }
 
-      const finalWOffset = getCorrectedOffset(baseWMinus, hDiff); // 垂直ズレ：W補正
-      const finalHOffset = getCorrectedOffset(baseHMinus, wDiff); // 水平ズレ：H補正
-
-      const resultW = KW + finalWOffset;
-      const resultH = adjustedKH + finalHOffset;
+      const correctedW = KW + getCorrectedMinus(baseWMinus, hDiff); // W: 垂直ズレ
+      const correctedH = rawH + getCorrectedMinus(baseHMinus, wDiff); // H: 水平ズレ + ハツリ
 
       document.getElementById('result').textContent =
-        `結果 → 幅: ${resultW} mm ／ 高さ: ${resultH} mm`;
+        `結果 → 幅: ${correctedW} mm ／ 高さ: ${correctedH} mm`;
     }
   </script>
 </body>
