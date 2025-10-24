@@ -31,7 +31,7 @@
   </label>
 
   <label>
-    <input type="checkbox" id="hatsuri"> ハツリ納まり（高さ +15mm）
+    <input type="checkbox" id="hatsuri"> ハツリ納まり（KH +15mm、Hの減算なし）
   </label>
 
   <label>水平ズレ（mm）※Hからマイナス
@@ -66,25 +66,31 @@
         document.getElementById('warning').textContent = '⚠ 高さ（KH）が横幅（KW）より小さいです。確認してください。';
       }
 
-      // 基本マイナス値
+      // 基本マイナス（Wのみ常に適用、Hはハツリ時は適用しない）
       const baseWMinus = type === '半外付' ? -20 : -10;
       const baseHMinus = type === '半外付' ? -10 : -5;
 
-      // Hへのハツリ加算
-      const rawH = hatsuri ? KH + 15 : KH;
-
-      // 補正関数（ズレ量が (基本マイナスの絶対値 - 2) を超えたら、1mmごとにマイナスを深く）
-      function getCorrectedMinus(baseMinus, diff) {
+      // ズレ補正ルール：基本マイナスが -10 なら 7mmまではそのまま
+      function getCorrectedMinus(baseMinus, diff, skip) {
+        if (skip) return 0;
         const threshold = Math.abs(baseMinus) - 2;
         const extra = diff > threshold ? diff - threshold : 0;
         return baseMinus - extra;
       }
 
-      const correctedW = KW + getCorrectedMinus(baseWMinus, hDiff); // W: 垂直ズレ
-      const correctedH = rawH + getCorrectedMinus(baseHMinus, wDiff); // H: 水平ズレ + ハツリ
+      // W（幅）補正は常に行う
+      const resultW = KW + getCorrectedMinus(baseWMinus, hDiff, false);
+
+      // H（高さ）：ハツリの時だけ KH+15、減算なし
+      let resultH;
+      if (hatsuri) {
+        resultH = KH + 15;
+      } else {
+        resultH = KH + getCorrectedMinus(baseHMinus, wDiff, false);
+      }
 
       document.getElementById('result').textContent =
-        `結果 → 幅: ${correctedW} mm ／ 高さ: ${correctedH} mm`;
+        `結果 → 幅: ${resultW} mm ／ 高さ: ${resultH} mm`;
     }
   </script>
 </body>
