@@ -33,11 +33,11 @@
     <input type="checkbox" id="hatsuri"> ハツリ納まり（高さ +15mm）
   </label>
 
-  <label>水平ズレ（mm）
+  <label>水平ズレ（mm）※Hからマイナス
     <input type="number" id="wdiff" value="0">
   </label>
 
-  <label>垂直ズレ（mm）
+  <label>垂直ズレ（mm）※Wからマイナス
     <input type="number" id="hdiff" value="0">
   </label>
 
@@ -51,30 +51,40 @@
       const KH = parseFloat(document.getElementById('kh').value);
       const type = document.getElementById('type').value;
       const hatsuri = document.getElementById('hatsuri').checked;
-      const wDiff = parseFloat(document.getElementById('wdiff').value);
-      const hDiff = parseFloat(document.getElementById('hdiff').value);
+      const wDiff = parseFloat(document.getElementById('wdiff').value) || 0;
+      const hDiff = parseFloat(document.getElementById('hdiff').value) || 0;
 
-      let wOffset = 0;
-      let hOffset = 0;
+      // 基本オフセット
+      let baseWOffset = 0;
+      let baseHOffset = 0;
 
       if (type === '半外付') {
-        wOffset = -20;
-        hOffset = -10;
+        baseWOffset = -20;
+        baseHOffset = -10;
       } else if (type === '内付') {
-        wOffset = -10;
-        hOffset = -5;
+        baseWOffset = -10;
+        baseHOffset = -5;
       }
 
-      if (Math.abs(hDiff) >= 8 && hOffset === -10) hOffset = -10 - Math.floor(hDiff);
-      if (Math.abs(hDiff) >= 3 && hOffset === -5) hOffset = -5 - Math.floor(hDiff);
+      // ハツリ納まり（高さ +15）
+      if (hatsuri) {
+        baseHOffset += 15;
+      }
 
-      if (Math.abs(wDiff) >= 8 && wOffset === -10) wOffset = -10 - Math.floor(wDiff);
-      if (Math.abs(wDiff) >= 3 && wOffset === -5) wOffset = -5 - Math.floor(wDiff);
+      // 水平ズレ：H（高さ）からさらにマイナス
+      let extraH = 0;
+      if (wDiff >= 8) {
+        extraH = Math.floor(wDiff);  // 1mm単位で加算
+      }
 
-      if (hatsuri) hOffset += 15;
+      // 垂直ズレ：W（幅）からさらにマイナス
+      let extraW = 0;
+      if (hDiff >= 8) {
+        extraW = Math.floor(hDiff);  // 1mm単位で加算
+      }
 
-      const resultW = KW + wOffset;
-      const resultH = KH + hOffset;
+      const resultW = KW + baseWOffset - extraW;
+      const resultH = KH + baseHOffset - extraH;
 
       document.getElementById('result').textContent =
         `結果 → 幅: ${resultW} mm ／ 高さ: ${resultH} mm`;
