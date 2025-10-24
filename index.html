@@ -1,0 +1,84 @@
+
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <title>寸法調整計算ツール</title>
+  <style>
+    body { font-family: sans-serif; padding: 2em; }
+    label { display: block; margin-top: 1em; }
+    input, select { padding: 0.5em; font-size: 1em; margin-top: 0.3em; width: 200px; }
+    .result { margin-top: 2em; font-weight: bold; font-size: 1.2em; }
+  </style>
+</head>
+<body>
+  <h1>寸法調整計算ツール</h1>
+
+  <label>KW（横寸法 mm）
+    <input type="number" id="kw">
+  </label>
+
+  <label>KH（縦寸法 mm）
+    <input type="number" id="kh">
+  </label>
+
+  <label>取付方式
+    <select id="type">
+      <option value="半外付">半外付</option>
+      <option value="内付">内付</option>
+    </select>
+  </label>
+
+  <label>
+    <input type="checkbox" id="hatsuri"> ハツリ納まり（高さ +15mm）
+  </label>
+
+  <label>水平ズレ（mm）
+    <input type="number" id="wdiff" value="0">
+  </label>
+
+  <label>垂直ズレ（mm）
+    <input type="number" id="hdiff" value="0">
+  </label>
+
+  <button onclick="calculate()">計算する</button>
+
+  <div class="result" id="result"></div>
+
+  <script>
+    function calculate() {
+      const KW = parseFloat(document.getElementById('kw').value);
+      const KH = parseFloat(document.getElementById('kh').value);
+      const type = document.getElementById('type').value;
+      const hatsuri = document.getElementById('hatsuri').checked;
+      const wDiff = parseFloat(document.getElementById('wdiff').value);
+      const hDiff = parseFloat(document.getElementById('hdiff').value);
+
+      let wOffset = 0;
+      let hOffset = 0;
+
+      if (type === '半外付') {
+        wOffset = -20;
+        hOffset = -10;
+      } else if (type === '内付') {
+        wOffset = -10;
+        hOffset = -5;
+      }
+
+      if (Math.abs(wDiff) >= 8 && wOffset === -10) wOffset = -12;
+      if (Math.abs(wDiff) >= 8 && wOffset === -20) wOffset = -22;
+
+      if (Math.abs(hDiff) >= 3 && hOffset === -5) hOffset = -7;
+      if (Math.abs(hDiff) >= 8 && hOffset === -10) hOffset = -12;
+
+      if (hatsuri) hOffset += 15;
+
+      const resultW = KW + wOffset;
+      const resultH = KH + hOffset;
+
+      document.getElementById('result').textContent =
+        `結果 → 幅: ${resultW} mm ／ 高さ: ${resultH} mm`;
+    }
+  </script>
+</body>
+</html>
