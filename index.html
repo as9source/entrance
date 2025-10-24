@@ -66,26 +66,28 @@
         document.getElementById('warning').textContent = '⚠ 高さ（KH）が横幅（KW）より小さいです。確認してください。';
       }
 
-      // 基本マイナス
+      // 基本マイナス（ハツリに関係なく）
       let baseWOffset = type === '半外付' ? -20 : -10;
       let baseHOffset = type === '半外付' ? -10 : -5;
 
+      // ハツリ納まりなら H に +15mm（元寸法に足す）
+      let effectiveKH = KH;
       if (hatsuri) {
-        baseHOffset += 15;
+        effectiveKH += 15;
       }
 
-      // 補正式: 基本マイナス値 - MAX(ズレ量 - (基本マイナス絶対値 - 2), 0)
+      // 補正式（ズレが (基本マイナス絶対値 - 2) を超えた分を追加マイナス）
       function correctedOffset(baseOffset, diff) {
         const threshold = Math.abs(baseOffset) - 2;
         const extra = Math.max(diff - threshold, 0);
         return baseOffset - extra;
       }
 
-      const finalWOffset = correctedOffset(baseWOffset, hDiff); // W: 垂直ズレ
-      const finalHOffset = correctedOffset(baseHOffset, wDiff); // H: 水平ズレ
+      const finalWOffset = correctedOffset(baseWOffset, hDiff); // W: 垂直ズレで補正
+      const finalHOffset = correctedOffset(baseHOffset, wDiff); // H: 水平ズレで補正
 
       const resultW = KW + finalWOffset;
-      const resultH = KH + finalHOffset;
+      const resultH = effectiveKH + finalHOffset;
 
       document.getElementById('result').textContent =
         `結果 → 幅: ${resultW} mm ／ 高さ: ${resultH} mm`;
