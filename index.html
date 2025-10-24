@@ -65,11 +65,11 @@
         hOffset = -5;
       }
 
-      if (Math.abs(wDiff) >= 8 && wOffset === -10) wOffset = -12;
-      if (Math.abs(wDiff) >= 8 && wOffset === -20) wOffset = -22;
+      if (Math.abs(hDiff) >= 8 && hOffset === -10) hOffset = -10 - Math.floor(hDiff);
+      if (Math.abs(hDiff) >= 3 && hOffset === -5) hOffset = -5 - Math.floor(hDiff);
 
-      if (Math.abs(hDiff) >= 3 && hOffset === -5) hOffset = -7;
-      if (Math.abs(hDiff) >= 8 && hOffset === -10) hOffset = -12;
+      if (Math.abs(wDiff) >= 8 && wOffset === -10) wOffset = -10 - Math.floor(wDiff);
+      if (Math.abs(wDiff) >= 3 && wOffset === -5) wOffset = -5 - Math.floor(wDiff);
 
       if (hatsuri) hOffset += 15;
 
