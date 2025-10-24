@@ -41,6 +41,10 @@
     <input type="number" id="hdiff" value="0">
   </label>
 
+  <label>有効開口（mm）※計算式は未実装
+    <input type="number" id="opening" disabled>
+  </label>
+
   <button onclick="calculate()">計算する</button>
 
   <div class="result" id="result"></div>
@@ -54,33 +58,24 @@
       const wDiff = parseFloat(document.getElementById('wdiff').value) || 0;
       const hDiff = parseFloat(document.getElementById('hdiff').value) || 0;
 
-      // 基本オフセット
-      let baseWOffset = 0;
-      let baseHOffset = 0;
+      // 基本マイナス
+      let baseWOffset = type === '半外付' ? -20 : -10;
+      let baseHOffset = type === '半外付' ? -10 : -5;
 
-      if (type === '半外付') {
-        baseWOffset = -20;
-        baseHOffset = -10;
-      } else if (type === '内付') {
-        baseWOffset = -10;
-        baseHOffset = -5;
-      }
-
-      // ハツリ納まり（高さ +15）
+      // ハツリ納まりによる高さ調整
       if (hatsuri) {
         baseHOffset += 15;
       }
 
-      // 水平ズレ：H（高さ）からさらにマイナス
-      let extraH = 0;
-      if (wDiff >= 8) {
-        extraH = Math.floor(wDiff);  // 1mm単位で加算
+      // ズレ補正条件（基本マイナス値の絶対値 - 2 より大きい場合）
+      let extraW = 0;
+      if (hDiff > Math.abs(baseWOffset) - 2) {
+        extraW = Math.floor(hDiff - (Math.abs(baseWOffset) - 2));
       }
 
-      // 垂直ズレ：W（幅）からさらにマイナス
-      let extraW = 0;
-      if (hDiff >= 8) {
-        extraW = Math.floor(hDiff);  // 1mm単位で加算
+      let extraH = 0;
+      if (wDiff > Math.abs(baseHOffset) - 2) {
+        extraH = Math.floor(wDiff - (Math.abs(baseHOffset) - 2));
       }
 
       const resultW = KW + baseWOffset - extraW;
